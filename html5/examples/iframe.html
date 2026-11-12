@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iframe | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+<script src="../kit.config.js"></script>
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>iframe</h1>
+<p>The recommended embed. ViewStream chooses the stream and the settings, so player updates and stream changes reach
+your site with no change on your side. The address names your tenant and what to play.</p>
+
+<p class="note" id="need" hidden>Put your tenant and channel in <code>kit.config.js</code> to see your channel here. The
+code below shows where they go.</p>
+<p class="note" id="counted" hidden>This plays your real channel through ViewStream's hosted page, so it counts as a
+viewing in your statistics.</p>
+
+<div class="stage" id="stage"></div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>The address</h2>
+<ul>
+  <li><code>/e/&lt;tenant&gt;/live/&lt;channel&gt;</code> for a live channel</li>
+  <li><code>/e/&lt;tenant&gt;/vod/&lt;video id&gt;</code> for a video</li>
+  <li><code>/e/&lt;tenant&gt;/clip/&lt;clip id&gt;</code> for a clip</li>
+</ul>
+<p>Options after <code>?</code>: <code>lang=he</code>, <code>en</code>, <code>ru</code> or <code>ar</code>;
+<code>autoplay=1</code> (starts muted); <code>config=&lt;name&gt;</code> for a named player configuration;
+<code>start=&lt;seconds&gt;</code> (not for live). ViewStream Studio writes the whole iframe for you: open a channel,
+clip or video and use <b>Embed &amp; share</b>.</p>
+</main>
+<script src="examples.js"></script>
+<script>
+(function () {
+  var X = VSExamples;
+  var tenant = X.tenant || '<tenant>', channel = X.tenant ? X.channel : '<channel>';
+  var src = X.cdn + 'e/' + tenant + '/live/' + channel + '?lang=en';
+  X.put('code',
+    '<iframe src="' + src + '"\n' +
+    '        allow="autoplay; fullscreen; picture-in-picture" allowfullscreen\n' +
+    '        style="aspect-ratio:16/9;width:100%;border:0"></iframe>');
+  if (!X.tenant) { document.getElementById('need').hidden = false; return; }
+  document.getElementById('counted').hidden = false;
+  var f = document.createElement('iframe');
+  f.src = X.cdn + 'e/' + encodeURIComponent(X.tenant) + '/live/' + encodeURIComponent(X.channel) + '?lang=en';
+  f.allow = 'autoplay; fullscreen; picture-in-picture';
+  f.allowFullscreen = true;
+  f.style.cssText = 'aspect-ratio:16/9;width:100%;border:0';
+  document.getElementById('stage').appendChild(f);
+})();
+</script>
+</body>
+</html>

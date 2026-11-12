@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player configuration | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Player configuration</h1>
+<p>Which buttons and features are on is decided by your <b>player configuration</b>, a document you edit in ViewStream
+Studio under <b>Players</b>. This example tries a configuration from the page with <code>configDoc</code>: the cinema
+skin, a red accent color, no speed menu, no picture-in-picture and no 10-second buttons.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="en"
+        data-aspect="16:9"
+        data-options='{
+          "configDoc": {
+            "skin": "cinema",
+            "theme": "dark",
+            "branding": {"color": "#E5484D"},
+            "controls": {"speed": false, "pip": false, "seek_buttons": false}
+          }
+        }'></script>
+<!-- example:end -->
+</div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>On your site</h2>
+<ul>
+  <li><b>Set it in Studio, not on the page.</b> Put the same keys in your player configuration in Studio. Every player
+  of your tenant then follows it, and a change reaches viewers within about a minute, with no change to your site.</li>
+  <li><b>A named configuration:</b> add <code>data-config="news"</code> to the tag, or <code>?config=news</code> to an
+  iframe address, to use the configuration you named <code>news</code> in Studio.</li>
+  <li><b>What wins:</b> attributes on the page, then the player configuration, then the player's built-in defaults.
+  <code>configDoc</code> is merged over your published configuration, so use it for trying things out.</li>
+  <li><b>Build one without writing JSON:</b> the <a href="../configurator.html">configurator</a> in this kit.</li>
+</ul>
+<p>Every key and its default: <a href="../docs/OPTIONS.md">docs/OPTIONS.md</a>. The whole flow:
+<a href="../docs/TENANT-AND-CONFIG.md">docs/TENANT-AND-CONFIG.md</a>.</p>
+</main>
+<script src="examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

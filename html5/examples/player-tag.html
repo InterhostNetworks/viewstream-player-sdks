@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player tag | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Player tag</h1>
+<p>The smallest embed. The tag loads everything else from ViewStream. The player fills the element named in
+<code>data-target</code>; without it, the player appears where the tag sits.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="en"
+        data-aspect="16:9"></script>
+<!-- example:end -->
+</div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>For your own content</h2>
+<p>Replace <code>data-src</code> with your stream address and add <code>data-tenant</code>. ViewStream Studio writes the
+whole tag for you: open a channel, clip or video and use <b>Embed &amp; share</b>. See
+<a href="live-channel.html">Live channel</a> for a working example with your tenant.</p>
+</main>
+<script src="examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

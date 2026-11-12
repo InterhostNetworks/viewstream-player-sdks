@@ -10,7 +10,7 @@ with live, video and ads, on your own computer.
 You need Python 3 and a modern browser. No account is needed.
 
 ```bash
-cd viewstream-html5-player-sdk-1.0.1
+cd viewstream-html5-player-sdk-1.1.0
 python3 serve.py
 ```
 
@@ -22,6 +22,13 @@ visible** stops the controls from hiding while you work. **Without my theme** sh
 
 **To see your own channel,** put your tenant and channel in `kit.config.js`. A **My channel** button then appears.
 
+The same server also runs two more tools:
+
+- <http://localhost:8000/configurator.html>: choose the content, look and features in a form, see them on the player,
+  and copy the configuration keys, the player tag or the iframe.
+- <http://localhost:8000/examples/>: small working pages for the iframe, the player tag, a live channel, video
+  options, the player configuration, ads, events and preview tiles. Each prints its own code.
+
 ## What's in the kit
 
 | Path | What it is |
@@ -29,6 +36,9 @@ visible** stops the controls from hiding while you work. **Without my theme** sh
 | `index.html`, `serve.py` | The workbench and its small local server |
 | `theme/my-theme.css` | **Your working file** |
 | `kit.config.js` | Optional: your tenant and channel |
+| `configurator.html` | The configurator: build a player configuration and its embed code |
+| `examples/` | Working example pages, ready to copy |
+| `docs/TENANT-AND-CONFIG.md` | **Start here for your own content:** connecting your tenant, and where each feature is configured |
 | `docs/OPTIONS.md` | **Every player capability and option:** configuration, tag attributes, keyboard, events |
 | `docs/THEMING.md` | Colors, sizes, class names and player states |
 | `docs/EMBED.md` | How the player goes on a page, its events, and how ads work |

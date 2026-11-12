@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML5 Player Configurator</title>
+<script src="kit.config.js"></script>
+<!-- the skin library's list of names; the configurator works without it (the seven built-in skins stay) -->
+<script src="https://player.viewstream.co.il/skins/skins.js"></script>
+<style>
+  :root { color-scheme: dark; --bg: #11151b; --panel: #1b2129; --line: #323b47; --ink: #eef1f4; --dim: #a7b1bc; --on: #2f6fde; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: #7fb4ff; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 17px; }
+  header p { margin: 0; color: var(--dim); flex: 1 1 320px; }
+  main { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 16px; padding: 16px; align-items: start; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } .stage { position: static !important; order: -1; } }
+  fieldset { margin: 0 0 12px; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+  legend { padding: 0 6px; font-weight: 600; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  .row > span:first-child { flex: 0 0 132px; color: var(--dim); }
+  .row select, .row input[type=text], .row input[type=url] { flex: 1; min-width: 0; }
+  select, input[type=text], input[type=url] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+  label.chk { display: flex; align-items: center; gap: 8px; margin: 4px 0; cursor: pointer; }
+  .hint { margin: 6px 0 0; color: var(--dim); font-size: 13px; }
+  .key { color: var(--dim); font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-inline-start: auto; }
+  .stage { position: sticky; top: 12px; min-width: 0; }
+  #hostwrap { width: 100%; margin: 0 auto; }
+  #status { margin: 10px 0 0; color: var(--dim); font-size: 13px; min-height: 1.4em; }
+  h2 { margin: 20px 0 4px; font-size: 15px; }
+  h2 + p { margin: 0 0 6px; color: var(--dim); font-size: 13px; }
+  pre { margin: 0; padding: 10px 12px; background: #0b0e12; border: 1px solid var(--line); border-radius: 8px; overflow: auto; max-height: 300px;
+    font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+  button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 12px; cursor: pointer; }
+  button:hover { border-color: var(--on); }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>HTML5 Player Configurator</h1>
+  <p>Choose the content, the look and the features, see them on the real player, then copy the result.
+  <a href="index.html">Workbench</a> · <a href="examples/index.html">Examples</a> · <a href="docs/TENANT-AND-CONFIG.md">Guide</a></p>
+</header>
+<main>
+<form id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Content</legend>
+    <label class="row"><span>Play</span><select name="source">
+      <option value="video">Sample video</option>
+      <option value="live">Sample live channel (this kit)</option>
+      <option value="mine">My live channel</option></select></label>
+    <label class="row"><span>Tenant</span><input type="text" name="tenant" maxlength="32" placeholder="my-company" spellcheck="false"></label>
+    <label class="row" data-for="mine"><span>Channel</span><input type="text" name="channel" maxlength="64" placeholder="main" spellcheck="false"></label>
+    <label class="row"><span>Named configuration</span><input type="text" name="config" maxlength="64" placeholder="none: the default" spellcheck="false"></label>
+    <div class="bar"><button type="button" id="connect">Connect my tenant</button><span id="tenantnote" class="hint" role="status"></span></div>
+    <p class="hint">With a tenant, the form shows your published player configuration, and your choices are laid over it.
+    Without one, the form starts from the player's defaults.</p>
+  </fieldset>
+  <fieldset>
+    <legend>Size on the page</legend>
+    <label class="row"><span>Aspect</span><select name="aspect">
+      <option value="16:9">16:9</option><option value="">From the video</option><option value="4:3">4:3</option><option value="1:1">1:1</option>
+      <option value="9:16">9:16</option><option value="21:9">21:9</option></select></label>
+    <label class="row"><span>Maximum width</span><select name="width">
+      <option value="0">Full width</option><option value="360">360 px</option><option value="480">480 px</option><option value="640">640 px</option>
+      <option value="854">854 px</option><option value="1280">1280 px</option></select></label>
+  </fieldset>
+  <div id="fields"></div>
+</form>
+
+<section class="stage" aria-label="Preview and results">
+  <div id="hostwrap"><div id="host0"></div></div>
+  <p id="status" role="status">Loading the player…</p>
+
+  <h2>Player configuration</h2>
+  <p>These are your choices as configuration keys. Set them in ViewStream Studio, under Players, so every player of
+  your tenant follows them. With a tenant connected, only the keys that differ from your published configuration are listed.</p>
+  <pre id="outConfig"></pre>
+  <div class="bar"><button type="button" data-copy="outConfig">Copy</button></div>
+
+  <h2>Player tag</h2>
+  <p>Paste it where the player should appear. It loads everything else from ViewStream.</p>
+  <pre id="outTag"></pre>
+  <div class="bar"><button type="button" data-copy="outTag">Copy</button>
+    <label class="chk"><input type="checkbox" id="inTag"> Put the configuration in the tag, for testing before it is set in Studio</label></div>
+
+  <div id="iframeBox" hidden>
+    <h2>iframe</h2>
+    <p>The recommended embed for your channel. It takes its look and features from your configuration in Studio.</p>
+    <pre id="outIframe"></pre>
+    <div class="bar"><button type="button" data-copy="outIframe">Copy</button></div>
+  </div>
+  <div class="bar"><button type="button" id="reset">Start over</button></div>
+</section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var CDN = 'https://player.viewstream.co.il/';
+  var MEDIA = CDN + 'assets/media/preview/';
+  var DEMO_TAGS = [CDN + 'ads/vast/pre.xml', CDN + 'ads/vast/pre-noskip.xml', CDN + 'ads/vast/vmap-all.xml'];
+  var KIT = window.VS_KIT || {};
+  var F = document.getElementById('f');
+  function $(id) { return document.getElementById(id); }
+  function put(id, text) { $(id).textContent = text; }
+  function status(text) { put('status', text); }
+
+  /* ------------------------------------------------------------ the configuration keys (docs/OPTIONS.md)
+     g group, k key, l label, t type, d the documented default, o options, n numeric, start the form's first value */
+  var B = 'bool', S = 'select', T = 'text', M = 'multi', C = 'color';
+  var skins = ['classic', 'cinema', 'neon', 'glass', 'minimal', 'emoji', 'retro'].map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; })
+    .concat((window.VS_SKIN_LIBRARY || []).map(function (s) { return [s.id, s.name + ' (skin library)']; }));
+  var FIELDS = [
+    { g: 'Look', k: 'skin', l: 'Skin', t: S, d: 'classic', o: skins, always: 1 },
+    { g: 'Look', k: 'theme', l: 'Dark or light', t: S, d: 'auto', o: [['auto', 'Follow the device'], ['dark', 'Dark'], ['light', 'Light']], always: 1 },
+    { g: 'Look', k: 'lang', l: 'Language', t: S, d: 'he', start: 'en', o: [['he', 'Hebrew'], ['en', 'English'], ['ru', 'Russian'], ['ar', 'Arabic']], always: 1 },
+    { g: 'Look', k: 'branding.color', l: 'Accent color', t: C, d: '' },
+    { g: 'Look', k: 'big_play_button', l: 'Big play button', t: B, d: true },
+
+    { g: 'Controls', k: 'controls.autoplay_muted', l: 'Autoplay, muted', t: B, d: false },
+    { g: 'Controls', k: 'controls.loop', l: 'Loop', t: B, d: false },
+    { g: 'Controls', k: 'controls.speed', l: 'Speed menu', t: B, d: true },
+    { g: 'Controls', k: 'controls.quality_menu', l: 'Quality menu', t: B, d: true },
+    { g: 'Controls', k: 'controls.captions', l: 'Subtitles menu', t: B, d: true },
+    { g: 'Controls', k: 'controls.chapters', l: 'Chapters', t: B, d: true },
+    { g: 'Controls', k: 'controls.share', l: 'Share button', t: B, d: true },
+    { g: 'Controls', k: 'controls.pip', l: 'Picture-in-picture', t: B, d: true },
+    { g: 'Controls', k: 'controls.cast', l: 'Chromecast', t: B, d: true },
+    { g: 'Controls', k: 'controls.fullscreen', l: 'Fullscreen', t: B, d: true },
+    { g: 'Controls', k: 'controls.volume', l: 'Volume', t: B, d: true },
+    { g: 'Controls', k: 'controls.seek_buttons', l: 'Back and forward 10 s', t: B, d: true },
+    { g: 'Controls', k: 'controls.stats', l: 'Technical stats panel', t: B, d: true },
+
+    { g: 'Playback', k: 'playback.start_rung', l: 'Starting quality', t: S, d: 'auto', o: [['auto', 'Automatic'], ['highest', 'Highest'], ['lowest', 'Lowest'], ['1080p', '1080p'], ['720p', '720p'], ['480p', '480p'], ['360p', '360p']] },
+    { g: 'Playback', k: 'playback.captions_default', l: 'Subtitles from the start', t: S, d: '', o: [['', 'Off until the viewer turns them on'], ['on', 'On']] },
+    { g: 'Playback', k: 'playback.captions_lang', l: 'Subtitle language', t: S, d: '', o: [['', 'Not set'], ['auto', "The viewer's language"], ['he', 'Hebrew'], ['en', 'English'], ['ru', 'Russian'], ['ar', 'Arabic']] },
+    { g: 'Playback', k: 'playback.captions_style', l: 'Subtitle style', t: S, d: 'default', o: [['default', 'Default'], ['large', 'Large'], ['high-contrast', 'High contrast']] },
+    { g: 'Playback', k: 'playback.remember_volume', l: "Remember the viewer's volume", t: B, d: true },
+    { g: 'Playback', k: 'playback.resume', l: 'Continue watching', t: B, d: true },
+
+    { g: 'Live', k: 'low_latency', l: 'Low-latency HLS', t: B, d: false },
+    { g: 'Live', k: 'live.epg_overlay', l: 'Programme card', t: B, d: true },
+    { g: 'Live', k: 'live.programme_bar', l: 'Seek bar spans the programme', t: B, d: true },
+    { g: 'Live', k: 'live.start_over_button', l: 'Start-over button', t: B, d: true },
+    { g: 'Live', k: 'live.prev_next_buttons', l: 'Previous and next programme', t: B, d: true },
+    { g: 'Live', k: 'live.show_channel_name', l: 'Channel name on the card', t: B, d: true },
+    { g: 'Live', k: 'live.now_badge', l: '"Now" badge', t: B, d: true },
+    { g: 'Live', k: 'live.wall_clock', l: 'Real time of the frame', t: B, d: true },
+    { g: 'Live', k: 'live.time_zone', l: 'Times in', t: S, d: 'channel', o: [['channel', "The channel's time zone"], ['viewer', "The viewer's time zone"]] },
+    { g: 'Live', k: 'live.epg_card_position', l: 'Card position', t: S, d: 'bottom-start', o: [['bottom-start', 'Bottom, start side'], ['bottom-end', 'Bottom, end side'], ['top-start', 'Top, start side'], ['top-end', 'Top, end side']] },
+    { g: 'Live', k: 'live.back_to_live_button', l: 'Back-to-live button', t: B, d: true },
+    { g: 'Live', k: 'live.back_to_live_label', l: 'Back-to-live label', t: T, d: '', max: 40, ph: 'the default, in the player language' },
+    { g: 'Live', k: 'live.max_seek_back_s', l: 'Rewind limit', t: S, n: 1, d: '', o: [['', 'The whole window'], ['0', 'Live only'], ['60', '1 minute'], ['300', '5 minutes'], ['900', '15 minutes'], ['1800', '30 minutes'], ['3600', '1 hour']] },
+    { g: 'Live', k: 'live.restart_button', l: 'Restart button (channels with no guide)', t: B, d: false },
+    { g: 'Live', k: 'live.restart_back_s', l: 'Restart jumps back', t: S, n: 1, d: 0, o: [['0', 'To the start of the window'], ['60', '1 minute'], ['300', '5 minutes'], ['600', '10 minutes'], ['1800', '30 minutes']] },
+
+    { g: 'Video', k: 'vod.title_overlay', l: 'Title card', t: B, d: true },
+    { g: 'Video', k: 'vod.show_description', l: 'Short description', t: B, d: false },
+    { g: 'Video', k: 'vod.show_date', l: 'Publish date', t: B, d: false },
+    { g: 'Video', k: 'vod.show_series', l: 'Series or section name', t: B, d: false },
+
+    { g: 'Ads', k: 'ads.enabled', l: 'Ads on', t: B, d: false },
+    { g: 'Ads', k: 'ads.default_tag', l: 'VAST or VMAP tag', t: T, d: '', max: 600, ph: 'https://…', list: DEMO_TAGS },
+    { g: 'Ads', k: 'ads.positions', l: 'Positions', t: M, d: ['pre'], o: ['pre', 'mid', 'post'] },
+    { g: 'Ads', k: 'ads.skip_offset_s', l: 'Skip after', t: S, n: 1, d: -1, o: [['-1', 'The ad decides'], ['0', 'Right away'], ['5', '5 s'], ['10', '10 s']] },
+    { g: 'Ads', k: 'ads.timeout_ms', l: 'Time for an ad to start', t: S, n: 1, d: 4000, o: [['4000', '4 s'], ['2000', '2 s'], ['6000', '6 s'], ['10000', '10 s']] }
+  ];
+  var HINTS = {
+    Live: 'These apply to live channels. Choose a live channel under Content to see them.',
+    Video: 'The title card shows what your Library knows about a video, so it appears with your own videos.',
+    Ads: 'The list offers ViewStream demo tags. Live channels play a pre-roll only.'
+  };
+
+  /* ------------------------------------------------------------ build the form from the keys */
+  function el(tag, props, kids) {
+    var e = document.createElement(tag), k;
+    for (k in props || {}) { if (k === 'text') { e.textContent = props[k]; } else { e.setAttribute(k, props[k]); } }
+    (kids || []).forEach(function (c) { e.appendChild(c); });
+    return e;
+  }
+  function addOption(sel, value, label) { var o = el('option', { value: value, text: label }); sel.appendChild(o); return o; }
+  (function build() {
+    var groups = {}, box = $('fields');
+    FIELDS.forEach(function (f) {
+      var fs = groups[f.g];
+      if (!fs) { fs = groups[f.g] = el('fieldset', {}, [el('legend', { text: f.g })]); box.appendChild(fs); }
+      var key = el('span', { 'class': 'key', text: f.k });
+      if (f.t === B) {
+        fs.appendChild(el('label', { 'class': 'chk' }, [el('input', { type: 'checkbox', name: f.k }), el('span', { text: f.l }), key]));
+      } else if (f.t === M) {
+        var row = el('div', { 'class': 'row' }, [el('span', { text: f.l })]);
+        f.o.forEach(function (o) { row.appendChild(el('label', { 'class': 'chk' }, [el('input', { type: 'checkbox', name: f.k + '|' + o }), el('span', { text: o })])); });
+        row.appendChild(key); fs.appendChild(row);
+      } else if (f.t === C) {
+        fs.appendChild(el('div', { 'class': 'row' }, [el('span', { text: f.l }),
+          el('label', { 'class': 'chk' }, [el('input', { type: 'checkbox', name: f.k + '|on' }), el('span', { text: 'custom' })]),
+          el('input', { type: 'color', name: f.k, value: '#47c7f4', 'aria-label': f.l }), key]));
+      } else if (f.t === S) {
+        var sel = el('select', { name: f.k });
+        f.o.forEach(function (o) { addOption(sel, o[0], o[1]); });
+        fs.appendChild(el('label', { 'class': 'row' }, [el('span', { text: f.l }), sel]));
+      } else {
+        var inp = el('input', { type: 'text', name: f.k, maxlength: f.max || 200, placeholder: f.ph || '', spellcheck: 'false' });
+        if (f.list) {
+          var dl = el('datalist', { id: 'dl-' + f.k });
+          f.list.forEach(function (v) { dl.appendChild(el('option', { value: v })); });
+          inp.setAttribute('list', 'dl-' + f.k); fs.appendChild(dl);
+        }
+        fs.appendChild(el('label', { 'class': 'row' }, [el('span', { text: f.l }), inp]));
+      }
+    });
+    Object.keys(HINTS).forEach(function (g) { if (groups[g]) { groups[g].appendChild(el('p', { 'class': 'hint', text: HINTS[g] })); } });
+  })();
+
+  /* ------------------------------------------------------------ form values */
+  function same(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function field(key) { return FIELDS.filter(function (f) { return f.k === key; })[0]; }
+  function getPath(o, path) { return path.split('.').reduce(function (x, k) { return x && typeof x === 'object' ? x[k] : undefined; }, o); }
+  function setPath(o, path, v) {
+    var ks = path.split('.'), last = ks.pop();
+    ks.forEach(function (k) { o = o[k] = o[k] || {}; });
+    o[last] = v;
+  }
+  function val(f) {
+    var e = F.elements;
+    if (f.t === B) { return e[f.k].checked; }
+    if (f.t === M) { return f.o.filter(function (o) { return e[f.k + '|' + o].checked; }); }
+    if (f.t === C) { return e[f.k + '|on'].checked ? e[f.k].value.toUpperCase() : ''; }
+    var v = String(e[f.k].value).trim();
+    return f.n && v !== '' ? Number(v) : v;
+  }
+  function setVal(f, v) {
+    var e = F.elements;
+    if (f.t === B) { e[f.k].checked = !!v; }
+    else if (f.t === M) { f.o.forEach(function (o) { e[f.k + '|' + o].checked = (v || []).indexOf(o) >= 0; }); }
+    else if (f.t === C) { e[f.k + '|on'].checked = !!v; if (/^#[0-9a-f]{6}$/i.test(v || '')) { e[f.k].value = v.toLowerCase(); } }
+    else if (f.t === S) {
+      var s = String(v === undefined || v === null ? '' : v);
+      if (!Array.prototype.some.call(e[f.k].options, function (o) { return o.value === s; })) { addOption(e[f.k], s, s); }
+      e[f.k].value = s;
+    } else { e[f.k].value = v || ''; }
+  }
+  /* a published value is used only when it has the type the key expects */
+  function fits(f, v) {
+    if (v === undefined || v === null) { return false; }
+    if (f.t === B) { return typeof v === 'boolean'; }
+    if (f.t === M) { return Array.isArray(v); }
+    if (f.n) { return typeof v === 'number'; }
+    return typeof v === 'string';
+  }
+
+  /* BASE: what the player does before your choices. The documented defaults, or your published configuration. */
+  var BASE = {}, PUB = null;
+  function reset(pub) {
+    PUB = pub || null;
+    FIELDS.forEach(function (f) {
+      var v = pub ? getPath(pub, f.k) : undefined, use = fits(f, v);
+      if (f.t === C && use) { v = v.toUpperCase(); }
+      if (f.t === M && use) { v = f.o.filter(function (o) { return v.indexOf(o) >= 0; }); }   /* the form's own order */
+      BASE[f.k] = use ? v : f.d;
+      setVal(f, use ? v : (f.start !== undefined && !pub ? f.start : f.d));
+    });
+  }
+  function configDoc() {
+    var doc = {};
+    FIELDS.forEach(function (f) {
+      var v = val(f);
+      if (v === '' || (same(v, BASE[f.k]) && !(f.always && !PUB))) { return; }
+      setPath(doc, f.k, v);
+    });
+    return doc;
+  }
+
+  /* ------------------------------------------------------------ what plays */
+  function page() {
+    var e = F.elements;
+    return { source: e.source.value, tenant: e.tenant.value.trim(), channel: e.channel.value.trim() || 'main',
+      config: e.config.value.trim().replace(/[^a-z0-9-]/gi, ''), aspect: e.aspect.value, width: e.width.value, inTag: $('inTag').checked };
+  }
+  /* -> {attrs, options, hidden} for the player tag, or {error}. hidden: used in the preview only, not in the code. */
+  function source(st) {
+    if (st.source === 'video') {
+      return { attrs: { src: MEDIA + 'hls/master.m3u8', poster: MEDIA + 'poster.jpg', title: 'Sample video' }, options: {
+        tracks: [{ src: MEDIA + 'captions-en.vtt', srclang: 'en', label: 'English' }, { src: MEDIA + 'captions-he.vtt', srclang: 'he', label: 'עברית' }],
+        chapters: [{ start: 0, title: 'Chapter one' }, { start: 7.5, title: 'Chapter two' }, { start: 15, title: 'Chapter three' }],
+        thumbnails: { sprite: MEDIA + 'thumbs.jpg', interval: 1, width: 160, height: 90, cols: 10 } }, hidden: {} };
+    }
+    if (st.source === 'live') {
+      return { attrs: { src: location.origin + '/live/sample/main/master.m3u8' }, options: {},
+        hidden: { epgUrl: location.origin + '/epg/sample/main.json', channelName: 'Sample Channel' },
+        note: "This is the kit's sample channel from serve.py. Choose My live channel for the tag of your own channel." };
+    }
+    /* your own live channel: the address is built from your tenant, so it is always a ViewStream stream */
+    if (!st.tenant) { return { error: 'Type your tenant and press Connect my tenant.' }; }
+    if (!PUB || PUB._tenant !== st.tenant) { return { error: 'Press Connect my tenant to look up "' + st.tenant + '".' }; }
+    if (!PUB.cdn_hostname) { return { error: 'Your configuration names no CDN host. Ask your ViewStream contact.' }; }
+    return { attrs: { src: 'https://' + PUB.cdn_hostname + '/live/' + st.tenant + '/' + st.channel + '/master.m3u8', tenant: st.tenant }, options: {}, hidden: {} };
+  }
+
+  /* ------------------------------------------------------------ the code that is shown */
+  function attr(v) { return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+  function tagHtml(attrs, options) {
+    var h = '<script async src="' + CDN + 'embed.js"';
+    Object.keys(attrs).forEach(function (k) {
+      if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== '') { h += '\n        data-' + k.replace(/[A-Z]/g, function (c) { return '-' + c.toLowerCase(); }) + '="' + attr(attrs[k]) + '"'; }
+    });
+    if (Object.keys(options).length) { h += "\n        data-options='" + JSON.stringify(options).replace(/&/g, '&amp;').replace(/'/g, '&#39;') + "'"; }
+    return h + '><\/script>';
+  }
+  function copy(o) { return JSON.parse(JSON.stringify(o)); }
+  function outputs(st, src, doc) {
+    put('outConfig', JSON.stringify(doc, null, 2));
+    $('iframeBox').hidden = st.source !== 'mine' || !!src.error;
+    if (src.error) { put('outTag', src.error); return; }
+    var attrs = copy(src.attrs), options = copy(src.options);
+    if (st.config) { attrs.config = st.config; }
+    if (st.aspect) { attrs.aspect = st.aspect; }
+    if (+st.width) { attrs.width = st.width; }
+    if (st.inTag && Object.keys(doc).length) { options.configDoc = doc; }
+    put('outTag', tagHtml(attrs, options) + (src.note ? '\n\n' + src.note : ''));
+    if (st.source === 'mine') {
+      var q = ['lang=' + val(field('lang'))];
+      if (st.config) { q.push('config=' + st.config); }
+      if (val(field('controls.autoplay_muted'))) { q.push('autoplay=1'); }
+      put('outIframe', '<iframe src="' + CDN + 'e/' + encodeURIComponent(st.tenant) + '/live/' + encodeURIComponent(st.channel) + '?' + q.join('&') + '"\n' +
+        '        allow="autoplay; fullscreen; picture-in-picture" allowfullscreen\n' +
+        '        style="aspect-ratio:16/9;width:100%;border:0"></iframe>');
+    }
+  }
+
+  /* ------------------------------------------------------------ the preview: a player tag, like on your page */
+  var gen = 0, current = $('host0');
+  function mount(st, src, doc) {
+    var old = current, host = document.createElement('div');
+    try { if (old.vsPlayer && old.vsPlayer.dispose) { old.vsPlayer.dispose(); } } catch (e) { /* already gone */ }
+    host.id = 'host' + (++gen);
+    old.parentNode.replaceChild(host, old);
+    current = host;
+    $('hostwrap').style.maxWidth = +st.width ? st.width + 'px' : '';
+    host.addEventListener('vs:ready', function (e) {
+      /* a player that finished loading after a newer choice replaced its box */
+      if (current !== host) { try { e.detail.player.dispose(); } catch (x) { /* nothing to do */ } return; }
+      status('Player ' + (window.VSVJS ? window.VSVJS.version : '') + ' from the CDN. Viewing reports are off on this page.');
+    });
+    host.addEventListener('vs:error', function (e) { status('The player could not start: ' + e.detail.error); });
+
+    /* preview only: never report viewing, and let a demo ad run on every reload */
+    var pdoc = copy(doc), o = copy(src.options), k;
+    pdoc.beacon = { enabled: false };
+    var ads = pdoc.ads;
+    if (ads && ads.enabled && DEMO_TAGS.indexOf(ads.default_tag) >= 0) { ads.max_per_session = 0; ads.min_interval_s = 0; ads.personalised = false; }
+    for (k in src.hidden) { o[k] = src.hidden[k]; }
+    o.configDoc = pdoc;
+    o.beacon = false;
+
+    Array.prototype.forEach.call(document.querySelectorAll('script.preview-tag'), function (t) { t.parentNode.removeChild(t); });
+    var s = document.createElement('script');
+    s.className = 'preview-tag';
+    s.async = true;
+    s.src = CDN + 'embed.js';
+    s.dataset.target = '#' + host.id;
+    Object.keys(src.attrs).forEach(function (key) { if (src.attrs[key]) { s.dataset[key] = src.attrs[key]; } });
+    if (st.config) { s.dataset.config = st.config; }
+    if (st.aspect) { s.dataset.aspect = st.aspect; }
+    s.dataset.options = JSON.stringify(o);
+    document.body.appendChild(s);
+  }
+
+  var timer = 0;
+  function render() {
+    var st = page(), doc = configDoc(), src = source(st);
+    Array.prototype.forEach.call(F.querySelectorAll('[data-for]'), function (r) { r.hidden = r.getAttribute('data-for') !== st.source; });
+    if (doc.ads && doc.ads.enabled && !doc.ads.default_tag && !BASE['ads.default_tag']) {
+      setVal(field('ads.default_tag'), DEMO_TAGS[0]);
+      doc = configDoc();
+    }
+    outputs(st, src, doc);
+    if (src.error) { status(src.error); return; }
+    status('Loading the player…');
+    mount(st, src, doc);
+  }
+  function soon() { clearTimeout(timer); timer = setTimeout(render, 300); }
+
+  /* ------------------------------------------------------------ your tenant */
+  function connect() {
+    var st = page(), note = $('tenantnote');
+    if (!st.tenant) { if (PUB) { reset(null); } note.textContent = ''; render(); return; }
+    note.textContent = 'Looking up "' + st.tenant + '"…';
+    fetch(CDN + 'player/config/' + encodeURIComponent(st.tenant) + (st.config ? '/' + st.config : '') + '.json').then(function (r) {
+      if (!r.ok) { throw new Error(st.config ? 'configuration "' + st.config + '" of tenant "' + st.tenant + '" was not found' : 'tenant "' + st.tenant + '" was not found'); }
+      return r.json();
+    }).then(function (c) {
+      c._tenant = st.tenant;
+      reset(c);
+      note.textContent = 'Connected: "' + st.tenant + '"' + (st.config ? ', configuration "' + st.config + '"' : '') + (c.cdn_hostname ? ', CDN host ' + c.cdn_hostname : '') + '.';
+      render();
+    }).catch(function (e) {
+      if (PUB) { reset(null); }   /* leave a tenant that was connected; keep your choices when none was */
+      note.textContent = 'Not connected: ' + e.message + '.';
+      render();
+    });
+  }
+
+  /* ------------------------------------------------------------ start */
+  F.elements.tenant.value = String(KIT.tenant || '').trim();
+  F.elements.channel.value = String(KIT.channel || '').trim();
+  reset(null);
+  F.addEventListener('input', soon);
+  F.addEventListener('change', soon);
+  $('inTag').addEventListener('change', soon);
+  $('connect').addEventListener('click', connect);
+  $('reset').addEventListener('click', function () { location.href = location.pathname; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (b) {
+    b.addEventListener('click', function () {
+      var text = $(b.getAttribute('data-copy')).textContent, done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, function () { status('Select the code and copy it.'); }); }
+      else { status('Select the code and copy it.'); }
+    });
+  });
+  if (F.elements.tenant.value) { F.elements.source.value = 'mine'; connect(); } else { render(); }
+})();
+</script>
+</body>
+</html>

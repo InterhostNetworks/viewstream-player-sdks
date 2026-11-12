@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ads (VAST) | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Ads (VAST)</h1>
+<p>Press play: a pre-roll runs before the video, with a skip button, a "Learn more" link and a countdown. The ad comes
+from a ViewStream demo VAST tag. If an ad fails or does not start in time, the video plays.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="en"
+        data-aspect="16:9"
+        data-options='{
+          "configDoc": {
+            "ads": {
+              "enabled": true,
+              "positions": ["pre"],
+              "default_tag": "https://player.viewstream.co.il/ads/vast/pre.xml",
+              "timeout_ms": 6000,
+              "max_per_session": 0,
+              "min_interval_s": 0,
+              "personalised": false
+            }
+          }
+        }'></script>
+<!-- example:end -->
+</div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>On your site</h2>
+<p>Nothing about ads goes on your page. Turn ads on and set your VAST or VMAP tags in your player configuration in
+ViewStream Studio, under <b>Players</b>, with the same <code>ads.*</code> keys as above. Other demo tags to try in
+<code>default_tag</code>: <code>ads/vast/pre-noskip.xml</code> (no skip button) and <code>ads/vast/vmap-all.xml</code>
+(pre, mid and post-roll; add <code>"mid"</code> and <code>"post"</code> to <code>positions</code>).</p>
+<p>Every <code>ads.*</code> key, including your own video as a pre-roll: <a href="../docs/OPTIONS.md">docs/OPTIONS.md</a>.</p>
+</main>
+<script src="examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

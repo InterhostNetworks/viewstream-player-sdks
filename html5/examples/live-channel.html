@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live channel | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+<script src="../kit.config.js"></script>
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Live channel</h1>
+<p>A live channel with the programme card, the programme seek bar, start-over, previous and next programme, and the
+back-to-live button. The player finds your tenant's configuration and programme guide from <code>data-tenant</code> and
+the stream address.</p>
+
+<p class="note" id="sample" hidden>No tenant is set in <code>kit.config.js</code>, so this plays the kit's sample
+channel from <code>serve.py</code>. The code below shows the tag for your own channel.</p>
+<p class="note" id="mine" hidden></p>
+
+<div class="stage"><div id="player"></div></div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>Where the values come from</h2>
+<ul>
+  <li><b>tenant:</b> your organization's short name in ViewStream. It is in every address and embed code that
+  <b>Embed &amp; share</b> in ViewStream Studio gives you: <code>/e/&lt;tenant&gt;/live/&lt;channel&gt;</code>.</li>
+  <li><b>channel:</b> the channel's short name, the last part of that same address.</li>
+  <li><b>CDN host:</b> the <code>cdn_hostname</code> value in
+  <code>https://player.viewstream.co.il/player/config/&lt;tenant&gt;.json</code>. This page reads it for you.</li>
+</ul>
+<p>Live settings, such as how far viewers may rewind or whether the start-over button shows, are the
+<code>live.*</code> keys of your player configuration: see <a href="configuration.html">Player configuration</a> and
+<a href="../docs/OPTIONS.md">docs/OPTIONS.md</a>.</p>
+</main>
+<script src="examples.js"></script>
+<script>
+(function () {
+  var X = VSExamples;
+  function tag(cdnHost, tenant, channel) {
+    return { target: '#player', src: 'https://' + cdnHost + '/live/' + tenant + '/' + channel + '/master.m3u8', tenant: tenant, lang: 'en' };
+  }
+  if (!X.tenant) {
+    /* The kit's own sample channel, served by serve.py: no tenant, so no configuration and no viewing reports. */
+    document.getElementById('sample').hidden = false;
+    X.put('code', X.tagHtml(tag('<cdn-host>', '<tenant>', '<channel>')));
+    X.playerTag({ target: '#player', src: location.origin + '/live/sample/main/master.m3u8', tenant: 'sample', lang: 'en' }, {},
+      { config: false, beacon: false, epgUrl: location.origin + '/epg/sample/main.json', channelName: 'Sample Channel' });
+    return;
+  }
+  X.tenantConfig(X.tenant).then(function (c) {
+    var note = document.getElementById('mine');
+    note.textContent = 'Playing channel "' + X.channel + '" of tenant "' + X.tenant + '" from ' + c.cdn_hostname + '.' +
+      (X.local ? ' Viewing reports are off while this page runs on your computer.' : '');
+    note.hidden = false;
+    X.put('code', X.playerTag(tag(c.cdn_hostname, X.tenant, X.channel), {}, X.quiet()));
+  }).catch(function (e) {
+    var note = document.getElementById('mine');
+    note.textContent = 'Your channel could not start: ' + e.message;
+    note.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video options | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Video with subtitles, chapters and thumbnails</h1>
+<p>Simple settings are <code>data-*</code> attributes. Lists and objects go in <code>data-options</code> as JSON. This
+video starts at second 5 with a poster, a title, two subtitle languages (English shown from the start), four chapters
+and thumbnails over the seek bar.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-poster="https://player.viewstream.co.il/assets/media/preview/poster.jpg"
+        data-title="Sample video"
+        data-lang="en"
+        data-aspect="16:9"
+        data-start="5"
+        data-resume="off"
+        data-options='{
+          "tracks": [
+            {"src": "https://player.viewstream.co.il/assets/media/preview/captions-en.vtt", "srclang": "en", "label": "English", "default": true},
+            {"src": "https://player.viewstream.co.il/assets/media/preview/captions-he.vtt", "srclang": "he", "label": "עברית"}
+          ],
+          "chapters": [
+            {"start": 0, "title": "A better view"},
+            {"start": 7.5, "title": "Made to move"},
+            {"start": 15, "title": "Sound on"},
+            {"start": 22.5, "title": "Ready when you are"}
+          ],
+          "thumbnails": {"sprite": "https://player.viewstream.co.il/assets/media/preview/thumbs.jpg", "interval": 1, "width": 160, "height": 90, "cols": 10}
+        }'></script>
+<!-- example:end -->
+</div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>More attributes</h2>
+<p><code>data-autoplay="1"</code> with <code>data-muted="1"</code> starts by itself (browsers allow autoplay only when
+muted). <code>data-loop="1"</code> repeats. <code>data-resume</code> is <code>ask</code> (the default), <code>auto</code>
+or <code>off</code>. Every attribute is listed in <a href="../docs/OPTIONS.md">docs/OPTIONS.md</a>.</p>
+</main>
+<script src="examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

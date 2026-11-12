@@ -107,6 +107,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         pass
 
 
-Handler.extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map, '.m4s': 'video/mp4', '.mp4': 'video/mp4'}
+Handler.extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map, '.m4s': 'video/mp4', '.mp4': 'video/mp4',
+                          '.md': 'text/plain; charset=utf-8'}  # the docs open in the browser, Hebrew included
 print(f'Open http://localhost:{PORT}  (press Ctrl+C to stop)')
 http.server.ThreadingHTTPServer(('127.0.0.1', PORT), functools.partial(Handler, directory=ROOT)).serve_forever()

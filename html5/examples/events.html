@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Events and reading the player</h1>
+<p>The player tag tells your page what happens. <code>vs:ready</code> hands you the player, which is a Video.js player,
+so all standard Video.js events work. Play, pause, seek and change the quality, and watch the log. Events reach your
+page only with the player tag: inside an iframe they stay in the iframe.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<pre id="log" class="log"></pre>
+<button type="button" id="read">Read the player now</button>
+
+<script>
+  var log = document.getElementById('log');
+  function say(text) { log.textContent += text + '\n'; log.scrollTop = log.scrollHeight; }
+
+  /* Listen before the tag loads. The events bubble, so the player's box or any parent works. */
+  document.addEventListener('vs:ready', function (e) {
+    var player = e.detail.player;
+    say('vs:ready: the player was created');
+    ['play', 'pause', 'ended', 'seeked', 'volumechange', 'fullscreenchange',
+     'vs:qualitychange', 'vs:captionchange', 'vs:audiochange', 'vs:skinchange', 'vs:themechange'].forEach(function (name) {
+      player.on(name, function () { say(name + ' at ' + player.currentTime().toFixed(1) + ' s'); });
+    });
+    document.getElementById('read').onclick = function () {
+      say('quality: ' + player.vs.qualityLabel() + ', skin: ' + player.vs.skin() +
+          ', paused: ' + player.paused() + ', volume: ' + player.volume().toFixed(2));
+    };
+  });
+  document.addEventListener('vs:config', function () { say('vs:config: the configuration was applied'); });
+  document.addEventListener('vs:error', function (e) { say('vs:error: ' + e.detail.error); });
+</script>
+
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="en"
+        data-aspect="16:9"></script>
+<!-- example:end -->
+</div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>Keep to reading</h2>
+<p>Read from the player, and do not change its source or its settings from your page. The full list of events and
+calls: <a href="../docs/OPTIONS.md">docs/OPTIONS.md</a> and <a href="../docs/EMBED.md">docs/EMBED.md</a>.</p>
+</main>
+<script src="examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

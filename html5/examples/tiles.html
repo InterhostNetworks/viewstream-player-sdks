@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview tiles | ViewStream HTML5 Player SDK examples</title>
+<link rel="stylesheet" href="examples.css">
+</head>
+<body>
+<nav><b>Examples</b> <a href="index.html">All</a> <a href="player-tag.html">Player tag</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">Live channel</a> <a href="video-options.html">Video options</a> <a href="configuration.html">Configuration</a> <a href="ads.html">Ads</a> <a href="events.html">Events</a> <a href="tiles.html">Tiles</a></nav>
+<main>
+<h1>Preview tiles</h1>
+<p>A tile is a muted, looping preview with no controls, for lists and home pages. On a computer it plays while the
+pointer rests on it; on a touch screen it plays when it is on screen. Nothing but the poster is loaded until then.
+A click tells your page, and your page opens the full player.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div class="tiles">
+  <div id="tile1"></div>
+  <div id="tile2"></div>
+  <div id="tile3"></div>
+</div>
+<p id="clicked">Click a tile.</p>
+
+<script async src="https://player.viewstream.co.il/embed.js" data-mode="tile" data-target="#tile1"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-poster="https://player.viewstream.co.il/assets/media/preview/poster.jpg"
+        data-start="0" data-end="7.5"></script>
+<script async src="https://player.viewstream.co.il/embed.js" data-mode="tile" data-target="#tile2"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-poster="https://player.viewstream.co.il/assets/media/preview/poster.jpg"
+        data-start="7.5" data-end="15"></script>
+<script async src="https://player.viewstream.co.il/embed.js" data-mode="tile" data-target="#tile3"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-poster="https://player.viewstream.co.il/assets/media/preview/poster.jpg"
+        data-start="15" data-end="22.5"></script>
+
+<script>
+  document.addEventListener('vs-tile-click', function (e) {
+    document.getElementById('clicked').textContent =
+      'Clicked ' + e.target.id + ' at ' + e.detail.pos.toFixed(1) + ' s. Your page would open the full player here.';
+  });
+</script>
+<!-- example:end -->
+</div>
+
+<h2>The code</h2>
+<pre id="code"></pre>
+
+<h2>Settings</h2>
+<p><code>data-trigger</code> is <code>auto</code> (the default), <code>hover</code> or <code>visible</code>.
+<code>data-start</code> and <code>data-end</code> choose the part that loops, in seconds. In your player configuration,
+<code>tile.trigger</code> and <code>tile.max_rung</code> set the default trigger and the highest preview quality.</p>
+</main>
+<script src="examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>
