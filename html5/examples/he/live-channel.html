@@ -16,6 +16,8 @@
 
 <p class="note" id="sample" hidden>לא הוגדר tenant בקובץ <code>kit.config.js</code>, ולכן מתנגן כאן הערוץ לדוגמה של הערכה
 מתוך <code>serve.py</code>. הקוד שלמטה מציג את התגית לערוץ שלכם.</p>
+<p class="note" id="sampleweb" hidden>הערוץ החי לדוגמה פועל רק בערכה שהורדתם. כתבו בטופס את ה-tenant ואת הערוץ שלכם כדי לנגן כאן את הערוץ שלכם. הקוד שלמטה מציג את התגית.</p>
+<div id="tenantform"></div>
 <p class="note" id="mine" hidden></p>
 
 <div class="stage"><div id="player"></div></div>
@@ -42,10 +44,13 @@
   function tag(cdnHost, tenant, channel) {
     return { target: '#player', src: 'https://' + cdnHost + '/live/' + tenant + '/' + channel + '/master.m3u8', tenant: tenant, lang: 'he' };
   }
+  X.tenantForm('tenantform');
   if (!X.tenant) {
     /* הערוץ לדוגמה של הערכה, מתוך serve.py: אין tenant, ולכן אין תצורה ואין דיווחי צפייה. */
-    document.getElementById('sample').hidden = false;
     X.put('code', X.tagHtml(tag('<cdn-host>', '<tenant>', '<channel>')));
+    /* באתר אין serve.py ולכן אין ערוץ לדוגמה: העמוד מציג את הקוד ומחכה ל-tenant שלכם. */
+    if (!X.local) { document.getElementById('sampleweb').hidden = false; return; }
+    document.getElementById('sample').hidden = false;
     X.playerTag({ target: '#player', src: location.origin + '/live/sample/main/master.m3u8', tenant: 'sample', lang: 'he' }, {},
       { config: false, beacon: false, epgUrl: location.origin + '/epg/sample/main.json', channelName: 'ערוץ לדוגמה' });
     return;
@@ -53,7 +58,7 @@
   X.tenantConfig(X.tenant).then(function (c) {
     var note = document.getElementById('mine');
     note.textContent = 'מתנגן הערוץ "' + X.channel + '" של ה-tenant "' + X.tenant + '" מתוך ' + c.cdn_hostname + '.' +
-      (X.local ? ' דיווחי הצפייה כבויים כל עוד העמוד רץ במחשב שלכם.' : '');
+      (X.local ? ' דיווחי הצפייה כבויים כל עוד העמוד רץ במחשב שלכם.' : ' הצפייה נספרת בסטטיסטיקות שלכם.');
     note.hidden = false;
     X.put('code', X.playerTag(tag(c.cdn_hostname, X.tenant, X.channel), {}, X.quiet()));
   }).catch(function (e) {

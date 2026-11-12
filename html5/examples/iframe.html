@@ -16,6 +16,8 @@ your site with no change on your side. The address names your tenant and what to
 
 <p class="note" id="need" hidden>Put your tenant and channel in <code>kit.config.js</code> to see your channel here. The
 code below shows where they go.</p>
+<p class="note" id="needweb" hidden>Type your tenant and channel in the form to see your channel here. The code below shows where they go.</p>
+<div id="tenantform"></div>
 <p class="note" id="counted" hidden>This plays your real channel through ViewStream's hosted page, so it counts as a
 viewing in your statistics.</p>
 
@@ -45,7 +47,8 @@ clip or video and use <b>Embed &amp; share</b>.</p>
     '<iframe src="' + src + '"\n' +
     '        allow="autoplay; fullscreen; picture-in-picture" allowfullscreen\n' +
     '        style="aspect-ratio:16/9;width:100%;border:0"></iframe>');
-  if (!X.tenant) { document.getElementById('need').hidden = false; return; }
+  X.tenantForm('tenantform');
+  if (!X.tenant) { document.getElementById(X.local ? 'need' : 'needweb').hidden = false; return; }
   document.getElementById('counted').hidden = false;
   var f = document.createElement('iframe');
   f.src = X.cdn + 'e/' + encodeURIComponent(X.tenant) + '/live/' + encodeURIComponent(X.channel) + '?lang=en';

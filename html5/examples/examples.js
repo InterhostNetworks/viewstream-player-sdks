@@ -6,6 +6,11 @@
   var KIT = window.VS_KIT || {};
   var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var HE = document.documentElement.lang === 'he';   /* the Hebrew pages in he/ share this file */
+  /* On the web there is no kit.config.js to edit: the tenant and channel can come from the page address instead
+     (?tenant=my-company&channel=main), which is what the small form of tenantForm() does. */
+  var Q = new URLSearchParams(location.search);
+  function slug(v, d) { return String(v || d || '').trim().replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64); }
+  var TENANT = slug(Q.get('tenant') || KIT.tenant).toLowerCase(), CHANNEL = slug(Q.get('channel') || KIT.channel, 'main');
   var NO_SOURCE = HE ? 'פתחו את העמוד דרך serve.py כדי לראות כאן את הקוד שלו.' : 'Open this page through serve.py to see its code here.';
 
   function attr(v) { return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
@@ -53,13 +58,32 @@
   /* Your tenant's public player configuration. It also names your CDN host (cdn_hostname). */
   function tenantConfig(tenant) {
     return fetch(CDN + 'player/config/' + encodeURIComponent(tenant) + '.json').then(function (r) {
-      if (!r.ok) { throw new Error(HE ? 'ה-tenant "' + tenant + '" לא נמצא. בדקו את kit.config.js.' : 'tenant "' + tenant + '" was not found. Check kit.config.js.'); }
+      if (!r.ok) { throw new Error(HE ? 'ה-tenant "' + tenant + '" לא נמצא.' + (LOCAL ? ' בדקו את kit.config.js.' : '') : 'tenant "' + tenant + '" was not found.' + (LOCAL ? ' Check kit.config.js.' : '')); }
       return r.json();
     });
   }
 
+  /* On the web: a two-field form that reloads the page with your tenant and channel. In the kit, kit.config.js does this. */
+  function tenantForm(id) {
+    var box = document.getElementById(id);
+    if (!box || LOCAL) { return; }
+    var f = document.createElement('form'), add = function (name, label, value, hint) {
+      var l = document.createElement('label'), i = document.createElement('input');
+      l.textContent = label + ' ';
+      i.name = name; i.value = value; i.placeholder = hint; i.maxLength = 64; i.spellcheck = false; i.dir = 'ltr';
+      l.appendChild(i); f.appendChild(l); f.appendChild(document.createTextNode(' '));
+    };
+    f.method = 'get'; f.className = 'tenantform';
+    add('tenant', HE ? 'ה-tenant שלכם:' : 'Your tenant:', TENANT, 'my-company');
+    add('channel', HE ? 'ערוץ:' : 'Channel:', TENANT ? CHANNEL : '', 'main');
+    var b = document.createElement('button'); b.type = 'submit'; b.textContent = HE ? 'הצגה' : 'Show';
+    f.appendChild(b);
+    box.appendChild(f);
+  }
+
   window.VSExamples = {
-    cdn: CDN, kit: KIT, local: LOCAL, tenant: String(KIT.tenant || '').trim(), channel: String(KIT.channel || 'main').trim(),
-    put: put, showSource: showSource, tagHtml: tagHtml, playerTag: playerTag, quiet: quiet, tenantConfig: tenantConfig
+    cdn: CDN, kit: KIT, local: LOCAL, tenant: TENANT, channel: CHANNEL,
+    put: put, showSource: showSource, tagHtml: tagHtml, playerTag: playerTag, quiet: quiet, tenantConfig: tenantConfig,
+    tenantForm: tenantForm
   };
 })();

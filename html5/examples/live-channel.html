@@ -17,6 +17,8 @@ the stream address.</p>
 
 <p class="note" id="sample" hidden>No tenant is set in <code>kit.config.js</code>, so this plays the kit's sample
 channel from <code>serve.py</code>. The code below shows the tag for your own channel.</p>
+<p class="note" id="sampleweb" hidden>The sample live channel runs only in the downloaded kit. Type your tenant and channel in the form to play your own channel here. The code below shows the tag.</p>
+<div id="tenantform"></div>
 <p class="note" id="mine" hidden></p>
 
 <div class="stage"><div id="player"></div></div>
@@ -43,10 +45,13 @@ channel from <code>serve.py</code>. The code below shows the tag for your own ch
   function tag(cdnHost, tenant, channel) {
     return { target: '#player', src: 'https://' + cdnHost + '/live/' + tenant + '/' + channel + '/master.m3u8', tenant: tenant, lang: 'en' };
   }
+  X.tenantForm('tenantform');
   if (!X.tenant) {
     /* The kit's own sample channel, served by serve.py: no tenant, so no configuration and no viewing reports. */
-    document.getElementById('sample').hidden = false;
     X.put('code', X.tagHtml(tag('<cdn-host>', '<tenant>', '<channel>')));
+    /* On the web there is no serve.py, so no sample channel: the page shows the code and waits for your tenant. */
+    if (!X.local) { document.getElementById('sampleweb').hidden = false; return; }
+    document.getElementById('sample').hidden = false;
     X.playerTag({ target: '#player', src: location.origin + '/live/sample/main/master.m3u8', tenant: 'sample', lang: 'en' }, {},
       { config: false, beacon: false, epgUrl: location.origin + '/epg/sample/main.json', channelName: 'Sample Channel' });
     return;
@@ -54,7 +59,7 @@ channel from <code>serve.py</code>. The code below shows the tag for your own ch
   X.tenantConfig(X.tenant).then(function (c) {
     var note = document.getElementById('mine');
     note.textContent = 'Playing channel "' + X.channel + '" of tenant "' + X.tenant + '" from ' + c.cdn_hostname + '.' +
-      (X.local ? ' Viewing reports are off while this page runs on your computer.' : '');
+      (X.local ? ' Viewing reports are off while this page runs on your computer.' : ' It counts as a viewing in your statistics.');
     note.hidden = false;
     X.put('code', X.playerTag(tag(c.cdn_hostname, X.tenant, X.channel), {}, X.quiet()));
   }).catch(function (e) {

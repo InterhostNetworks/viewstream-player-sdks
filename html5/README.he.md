@@ -10,7 +10,7 @@
 צריך Python 3 ודפדפן עדכני. אין צורך בחשבון.
 
 ```bash
-cd viewstream-html5-player-sdk-1.2.0
+cd viewstream-html5-player-sdk-1.3.0
 python3 serve.py
 ```
 
@@ -32,6 +32,8 @@ python3 serve.py
 - הדוגמאות, בכתובת <http://localhost:8000/examples/>: עמודים קטנים ועובדים של iframe, תגית נגן, ערוץ חי, אפשרויות
   סרטון, תצורת נגן, פרסומות, אירועים ואריחי תצוגה מקדימה. כל עמוד מציג את הקוד של עצמו. הדוגמאות בעברית נמצאות בכתובת
   <http://localhost:8000/examples/he/>.
+
+הדוגמאות וכלי התצורה רצים גם באתר, בלי להוריד דבר: <https://player.viewstream.co.il/sdk/html5/examples/he/>.
 
 ## מה יש בערכה
 

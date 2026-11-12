@@ -407,6 +407,10 @@
   }
 
   /* ------------------------------------------------------------ start */
+  /* the sample live channel comes from serve.py: on the web that choice is left out */
+  if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+    Array.prototype.forEach.call(F.elements.source.options, function (o) { if (o.value === 'live') { F.elements.source.removeChild(o); } });
+  }
   F.elements.tenant.value = String(KIT.tenant || '').trim();
   F.elements.channel.value = String(KIT.channel || '').trim();
   reset(null);

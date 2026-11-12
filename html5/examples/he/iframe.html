@@ -16,6 +16,8 @@
 
 <p class="note" id="need" hidden>כתבו את ה-tenant ואת הערוץ שלכם בקובץ <code>kit.config.js</code> כדי לראות כאן את הערוץ
 שלכם. הקוד שלמטה מראה איפה הם נכתבים.</p>
+<p class="note" id="needweb" hidden>כתבו בטופס את ה-tenant ואת הערוץ שלכם כדי לראות כאן את הערוץ שלכם. הקוד שלמטה מראה איפה הם נכתבים.</p>
+<div id="tenantform"></div>
 <p class="note" id="counted" hidden>כאן מתנגן הערוץ האמיתי שלכם דרך העמוד המתארח של ViewStream, ולכן הצפייה נספרת
 בסטטיסטיקות שלכם.</p>
 
@@ -45,7 +47,8 @@
     '<iframe src="' + src + '"\n' +
     '        allow="autoplay; fullscreen; picture-in-picture" allowfullscreen\n' +
     '        style="aspect-ratio:16/9;width:100%;border:0"></iframe>');
-  if (!X.tenant) { document.getElementById('need').hidden = false; return; }
+  X.tenantForm('tenantform');
+  if (!X.tenant) { document.getElementById(X.local ? 'need' : 'needweb').hidden = false; return; }
   document.getElementById('counted').hidden = false;
   var f = document.createElement('iframe');
   f.src = X.cdn + 'e/' + encodeURIComponent(X.tenant) + '/live/' + encodeURIComponent(X.channel) + '?lang=he';

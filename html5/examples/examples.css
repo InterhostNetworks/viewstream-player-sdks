@@ -21,5 +21,7 @@ pre { margin: 8px 0; padding: 12px 14px; background: #0b0e12; border: 1px solid 
 ul.list { padding: 0; list-style: none; }
 ul.list li { margin: 10px 0; padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
 ul.list li p { margin: 2px 0 0; }
+.tenantform { margin: 12px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.tenantform input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; width: 11em; }
 button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
 button:hover { border-color: var(--on); }
