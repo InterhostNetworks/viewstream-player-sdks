@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>אירועים | דוגמאות לערכת הפיתוח לנגן HTML5 של ViewStream</title>
+<link rel="stylesheet" href="../examples.css">
+</head>
+<body>
+<nav><b>דוגמאות</b> <a href="index.html">הכול</a> <a href="player-tag.html">תגית נגן</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">ערוץ חי</a> <a href="video-options.html">אפשרויות סרטון</a> <a href="configuration.html">תצורה</a> <a href="ads.html">פרסומות</a> <a href="events.html">אירועים</a> <a href="tiles.html">אריחים</a> <a href="../events.html" lang="en">English</a></nav>
+<main>
+<h1>אירועים וקריאת מידע מהנגן</h1>
+<p>תגית הנגן מודיעה לעמוד שלכם מה קורה. האירוע <code>vs:ready</code> מוסר לכם את הנגן, שהוא נגן Video.js, ולכן כל אירועי
+Video.js הרגילים פועלים. נגנו, השהו, דלגו והחליפו איכות, ועקבו אחרי היומן. האירועים מגיעים לעמוד שלכם רק עם תגית הנגן:
+בתוך iframe הם נשארים בתוך ה-iframe.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<pre id="log" class="log"></pre>
+<button type="button" id="read">קריאת מצב הנגן עכשיו</button>
+
+<script>
+  var log = document.getElementById('log');
+  function say(text) { log.textContent += text + '\n'; log.scrollTop = log.scrollHeight; }
+
+  /* מאזינים לפני שהתגית נטענת. האירועים מבעבעים למעלה, ולכן אפשר להאזין על תיבת הנגן או על כל אלמנט אב. */
+  document.addEventListener('vs:ready', function (e) {
+    var player = e.detail.player;
+    say('vs:ready: הנגן נוצר');
+    ['play', 'pause', 'ended', 'seeked', 'volumechange', 'fullscreenchange',
+     'vs:qualitychange', 'vs:captionchange', 'vs:audiochange', 'vs:skinchange', 'vs:themechange'].forEach(function (name) {
+      player.on(name, function () { say(name + ' @ ' + player.currentTime().toFixed(1) + ' s'); });
+    });
+    document.getElementById('read').onclick = function () {
+      say('quality: ' + player.vs.qualityLabel() + ', skin: ' + player.vs.skin() +
+          ', paused: ' + player.paused() + ', volume: ' + player.volume().toFixed(2));
+    };
+  });
+  document.addEventListener('vs:config', function () { say('vs:config: התצורה הוחלה'); });
+  document.addEventListener('vs:error', function (e) { say('vs:error: ' + e.detail.error); });
+</script>
+
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="he"
+        data-aspect="16:9"></script>
+<!-- example:end -->
+</div>
+
+<h2>הקוד</h2>
+<pre id="code"></pre>
+
+<h2>קוראים בלבד</h2>
+<p>קראו מידע מהנגן, ואל תשנו מהעמוד שלכם את המקור שלו או את ההגדרות שלו. הרשימה המלאה של האירועים והקריאות:
+<a href="../../docs/OPTIONS.he.md">docs/OPTIONS.he.md</a> ו-<a href="../../docs/EMBED.he.md">docs/EMBED.he.md</a>.</p>
+</main>
+<script src="../examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

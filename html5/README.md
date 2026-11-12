@@ -10,7 +10,7 @@ with live, video and ads, on your own computer.
 You need Python 3 and a modern browser. No account is needed.
 
 ```bash
-cd viewstream-html5-player-sdk-1.1.0
+cd viewstream-html5-player-sdk-1.2.0
 python3 serve.py
 ```
 
@@ -27,7 +27,8 @@ The same server also runs two more tools:
 - <http://localhost:8000/configurator.html>: choose the content, look and features in a form, see them on the player,
   and copy the configuration keys, the player tag or the iframe.
 - <http://localhost:8000/examples/>: small working pages for the iframe, the player tag, a live channel, video
-  options, the player configuration, ads, events and preview tiles. Each prints its own code.
+  options, the player configuration, ads, events and preview tiles. Each prints its own code. In Hebrew too, under
+  `examples/he/`.
 
 ## What's in the kit
 

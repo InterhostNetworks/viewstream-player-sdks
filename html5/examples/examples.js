@@ -5,6 +5,8 @@
   var CDN = 'https://player.viewstream.co.il/';
   var KIT = window.VS_KIT || {};
   var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var HE = document.documentElement.lang === 'he';   /* the Hebrew pages in he/ share this file */
+  var NO_SOURCE = HE ? 'פתחו את העמוד דרך serve.py כדי לראות כאן את הקוד שלו.' : 'Open this page through serve.py to see its code here.';
 
   function attr(v) { return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
   function dash(k) { return k.replace(/[A-Z]/g, function (c) { return '-' + c.toLowerCase(); }); }
@@ -14,8 +16,8 @@
   function showSource(id) {
     fetch(location.href).then(function (r) { return r.text(); }).then(function (html) {
       var m = /<!-- example:start -->\s*\n([\s\S]*?)\n\s*<!-- example:end -->/.exec(html);
-      put(id || 'code', m ? m[1] : 'Open this page through serve.py to see its code here.');
-    }, function () { put(id || 'code', 'Open this page through serve.py to see its code here.'); });
+      put(id || 'code', m ? m[1] : NO_SOURCE);
+    }, function () { put(id || 'code', NO_SOURCE); });
   }
 
   /* The HTML of a player tag: attrs become data-* attributes, options become data-options (JSON). */
@@ -51,7 +53,7 @@
   /* Your tenant's public player configuration. It also names your CDN host (cdn_hostname). */
   function tenantConfig(tenant) {
     return fetch(CDN + 'player/config/' + encodeURIComponent(tenant) + '.json').then(function (r) {
-      if (!r.ok) { throw new Error('tenant "' + tenant + '" was not found. Check kit.config.js.'); }
+      if (!r.ok) { throw new Error(HE ? 'ה-tenant "' + tenant + '" לא נמצא. בדקו את kit.config.js.' : 'tenant "' + tenant + '" was not found. Check kit.config.js.'); }
       return r.json();
     });
   }

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תצורת נגן | דוגמאות לערכת הפיתוח לנגן HTML5 של ViewStream</title>
+<link rel="stylesheet" href="../examples.css">
+</head>
+<body>
+<nav><b>דוגמאות</b> <a href="index.html">הכול</a> <a href="player-tag.html">תגית נגן</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">ערוץ חי</a> <a href="video-options.html">אפשרויות סרטון</a> <a href="configuration.html">תצורה</a> <a href="ads.html">פרסומות</a> <a href="events.html">אירועים</a> <a href="tiles.html">אריחים</a> <a href="../configuration.html" lang="en">English</a></nav>
+<main>
+<h1>תצורת נגן</h1>
+<p>אילו כפתורים ותכונות פעילים נקבע ב<b>תצורת הנגן</b> שלכם, מסמך שעורכים ב-ViewStream Studio תחת <b>נגנים</b>. הדוגמה
+הזו מנסה תצורה מתוך העמוד בעזרת <code>configDoc</code>: הסקין cinema, צבע ראשי אדום, בלי תפריט מהירות, בלי תמונה בתוך
+תמונה ובלי כפתורי 10 השניות.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="he"
+        data-aspect="16:9"
+        data-options='{
+          "configDoc": {
+            "skin": "cinema",
+            "theme": "dark",
+            "branding": {"color": "#E5484D"},
+            "controls": {"speed": false, "pip": false, "seek_buttons": false}
+          }
+        }'></script>
+<!-- example:end -->
+</div>
+
+<h2>הקוד</h2>
+<pre id="code"></pre>
+
+<h2>באתר שלכם</h2>
+<ul>
+  <li><b>קובעים ב-Studio ולא בעמוד.</b> כתבו את אותם מפתחות בתצורת הנגן שלכם ב-Studio. כל הנגנים של הארגון שלכם פועלים
+  לפיה, ושינוי מגיע לצופים תוך כדקה, בלי שום שינוי באתר שלכם.</li>
+  <li><b>תצורה בעלת שם:</b> הוסיפו <code>data-config="news"</code> לתגית, או <code>?config=news</code> לכתובת של iframe,
+  כדי להשתמש בתצורה שקראתם לה <code>news</code> ב-Studio.</li>
+  <li><b>מה גובר:</b> מאפיינים בעמוד, אחריהם תצורת הנגן, ואחריה ברירות המחדל המובנות של הנגן. המפתח
+  <code>configDoc</code> מתמזג מעל התצורה שפרסמתם, ולכן הוא מתאים לניסויים.</li>
+  <li><b>בונים תצורה בלי לכתוב JSON:</b> <a href="../../configurator.html">כלי התצורה</a> שבערכה.</li>
+</ul>
+<p>כל המפתחות וברירות המחדל שלהם: <a href="../../docs/OPTIONS.he.md">docs/OPTIONS.he.md</a>. התהליך המלא:
+<a href="../../docs/TENANT-AND-CONFIG.he.md">docs/TENANT-AND-CONFIG.he.md</a>.</p>
+</main>
+<script src="../examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>

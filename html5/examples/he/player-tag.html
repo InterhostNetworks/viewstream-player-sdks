@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תגית נגן | דוגמאות לערכת הפיתוח לנגן HTML5 של ViewStream</title>
+<link rel="stylesheet" href="../examples.css">
+</head>
+<body>
+<nav><b>דוגמאות</b> <a href="index.html">הכול</a> <a href="player-tag.html">תגית נגן</a> <a href="iframe.html">iframe</a> <a href="live-channel.html">ערוץ חי</a> <a href="video-options.html">אפשרויות סרטון</a> <a href="configuration.html">תצורה</a> <a href="ads.html">פרסומות</a> <a href="events.html">אירועים</a> <a href="tiles.html">אריחים</a> <a href="../player-tag.html" lang="en">English</a></nav>
+<main>
+<h1>תגית נגן</h1>
+<p>ההטמעה הקטנה ביותר. התגית טוענת את כל השאר מ-ViewStream. הנגן ממלא את האלמנט שמצוין במאפיין
+<code>data-target</code>; בלי המאפיין הזה הנגן מופיע במקום שבו נמצאת התגית.</p>
+
+<div class="stage">
+<!-- example:start -->
+<div id="player"></div>
+<script async src="https://player.viewstream.co.il/embed.js"
+        data-target="#player"
+        data-src="https://player.viewstream.co.il/assets/media/preview/hls/master.m3u8"
+        data-lang="he"
+        data-aspect="16:9"></script>
+<!-- example:end -->
+</div>
+
+<h2>הקוד</h2>
+<pre id="code"></pre>
+
+<h2>לתוכן שלכם</h2>
+<p>החליפו את <code>data-src</code> בכתובת השידור שלכם והוסיפו <code>data-tenant</code>. ViewStream Studio כותב לכם את
+התגית כולה: פתחו ערוץ, קליפ או סרטון והשתמשו ב-<b>הטמעה ושיתוף</b>. דוגמה עובדת עם ה-tenant שלכם נמצאת בעמוד
+<a href="live-channel.html">ערוץ חי</a>.</p>
+</main>
+<script src="../examples.js"></script>
+<script>VSExamples.showSource();</script>
+</body>
+</html>
