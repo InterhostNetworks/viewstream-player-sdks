@@ -1,0 +1,40 @@
+/* Your player theme. This is the file you edit.
+   Every rule is scoped to .my-theme, so nothing here can touch the rest of your page.
+   The values below are the player's defaults. Change them, then refresh the workbench.
+   See docs/THEMING.md for every variable, class name and state. */
+
+/* Dark look */
+.video-js.vs-theme.my-theme {
+  --vs-accent: #47C7F4;                 /* main color: play button, progress, highlights */
+  --vs-accent-ink: #04121B;             /* icon or text on the main color */
+  --vs-ui: #fff;                        /* icons and text */
+  --vs-ui-dim: rgba(255, 255, 255, .72);
+  --vs-panel: rgba(12, 16, 22, .92);    /* menus and panels */
+  --vs-border: rgba(255, 255, 255, .14);
+  --vs-hover: rgba(255, 255, 255, .08);
+  --vs-rail: #BDBDBD;                   /* seek bar track */
+  --vs-buf: #636363;                    /* buffered part of the seek bar */
+  --vs-radius: 14px;                    /* player corners */
+  --vs-bar: 4px;                        /* seek bar height */
+  --vs-bar-hover: 7px;
+}
+
+/* Light look */
+.video-js.vs-theme.vs-light.my-theme {
+  --vs-accent: #0A6E96;
+  --vs-accent-ink: #fff;
+  --vs-ui: #0B1116;
+  --vs-ui-dim: rgba(11, 17, 22, .78);
+  --vs-panel: rgba(252, 253, 255, .96);
+  --vs-border: rgba(11, 17, 22, .18);
+  --vs-hover: rgba(11, 17, 22, .09);
+  --vs-rail: #939393;
+  --vs-buf: #0A0F14;
+}
+
+/* Your own rules go here. For example:
+
+.video-js.vs-theme.my-theme .vjs-big-play-button { border-radius: 12px; }
+.video-js.vs-theme.my-theme .vs-epg-title { font-weight: 700; }
+.video-js.vs-theme.my-theme .vs-ad__skip { border-radius: 4px; }
+*/

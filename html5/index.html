@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML5 Player Workbench</title>
+<link rel="stylesheet" href="theme/my-theme.css" id="theme-css">
+<script src="kit.config.js"></script>
+<style>
+  :root { color-scheme: dark; --bg: #11151b; --panel: #1b2129; --line: #323b47; --ink: #eef1f4; --dim: #a7b1bc; --on: #2f6fde; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  header { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 17px; }
+  header p { margin: 2px 0 0; color: var(--dim); }
+  form { display: flex; flex-wrap: wrap; gap: 12px 18px; padding: 12px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  fieldset { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0; padding: 0; border: 0; }
+  legend { float: left; margin-inline-end: 8px; color: var(--dim); padding: 4px 0; }
+  label { cursor: pointer; }
+  input[type=radio], input[type=checkbox] { position: absolute; opacity: 0; }
+  label span { display: block; padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; }
+  input:checked + span { background: var(--on); border-color: var(--on); color: #fff; }
+  input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+  main { padding: 16px; }
+  #stage { width: 100%; margin: 0 auto; }
+  #status { max-width: 1280px; margin: 12px auto 0; color: var(--dim); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>HTML5 Player Workbench</h1>
+  <p>Edit <code>theme/my-theme.css</code>, then refresh. The player itself loads from the ViewStream CDN.</p>
+</header>
+<form id="controls">
+  <fieldset><legend>Content</legend>
+    <label><input type="radio" name="scenario" value="live"><span>Sample live channel</span></label>
+    <label id="mine-row" hidden><input type="radio" name="scenario" value="mine"><span>My channel</span></label>
+    <label><input type="radio" name="scenario" value="vod"><span>Video, subtitles, chapters</span></label>
+    <label><input type="radio" name="scenario" value="ads"><span>VAST ad</span></label>
+    <label><input type="radio" name="scenario" value="noskip"><span>VAST, no skip</span></label>
+  </fieldset>
+  <fieldset><legend>Language</legend>
+    <label><input type="radio" name="lang" value="en"><span>English</span></label>
+    <label><input type="radio" name="lang" value="he"><span>Hebrew (RTL)</span></label>
+  </fieldset>
+  <fieldset><legend>Colors</legend>
+    <label><input type="radio" name="mode" value="dark"><span>Dark</span></label>
+    <label><input type="radio" name="mode" value="light"><span>Light</span></label>
+  </fieldset>
+  <fieldset><legend>Width</legend>
+    <label><input type="radio" name="w" value="360"><span>Phone 360</span></label>
+    <label><input type="radio" name="w" value="768"><span>Tablet 768</span></label>
+    <label><input type="radio" name="w" value="1280"><span>Desktop 1280</span></label>
+  </fieldset>
+  <fieldset><legend>Check</legend>
+    <label><input type="checkbox" name="pin" value="1"><span>Keep controls visible</span></label>
+    <label><input type="checkbox" name="plain" value="1"><span>Without my theme</span></label>
+  </fieldset>
+</form>
+<main>
+  <div id="stage"></div>
+  <p id="status" role="status">Loading the player…</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  var CDN = 'https://player.viewstream.co.il/';
+  var MEDIA = CDN + 'assets/media/preview/';
+  var KIT = window.VS_KIT || {};
+  var DEFAULTS = { scenario: 'live', lang: 'en', mode: 'dark', w: '1280' };
+  var q = new URLSearchParams(location.search);
+  var s = {};
+  Object.keys(DEFAULTS).forEach(function (k) { s[k] = q.get(k) || DEFAULTS[k]; });
+  s.pin = q.get('pin') === '1';
+  s.plain = q.get('plain') === '1';
+
+  var form = document.getElementById('controls');
+  document.getElementById('mine-row').hidden = !KIT.tenant;
+  if (s.scenario === 'mine' && !KIT.tenant) { s.scenario = 'live'; }
+  Array.prototype.forEach.call(form.elements, function (el) {
+    if (el.type === 'radio') { el.checked = s[el.name] === el.value; }
+    if (el.type === 'checkbox') { el.checked = !!s[el.name]; }
+  });
+  form.addEventListener('change', function () {
+    var n = new URLSearchParams();
+    Object.keys(DEFAULTS).forEach(function (k) { n.set(k, form.elements[k].value); });
+    if (form.elements.pin.checked) { n.set('pin', '1'); }
+    if (form.elements.plain.checked) { n.set('plain', '1'); }
+    location.search = n.toString();
+  });
+
+  var status = document.getElementById('status');
+  var stage = document.getElementById('stage');
+  /* fits the window, so the control bar stays on screen */
+  stage.style.maxWidth = 'min(' + s.w + 'px, calc((100vh - 250px) * 16 / 9))';
+  stage.style.minWidth = 'min(100%, ' + Math.min(+s.w, 360) + 'px)';
+  if (s.plain) { document.getElementById('theme-css').disabled = true; }
+
+  /* The workbench never reports viewing, so design work does not count in anyone's statistics. */
+  var doc = { beacon: { enabled: false }, branding: { color: '' }, steering: { enabled: false } };
+  var opts = { beacon: false, theme: s.mode, lang: s.lang, configDoc: doc };
+  if (s.pin) { opts.idleMs = 86400000; }
+
+  var video = {
+    sources: [{ src: MEDIA + 'hls/master.m3u8', type: 'application/x-mpegURL' }],
+    poster: MEDIA + 'poster.jpg',
+    title: 'Sample video',
+    tracks: [
+      { src: MEDIA + 'captions-en.vtt', srclang: 'en', label: 'English' },
+      { src: MEDIA + 'captions-he.vtt', srclang: 'he', label: 'עברית' }
+    ],
+    chapters: [{ start: 0, title: 'Chapter one' }, { start: 7.5, title: 'Chapter two' }, { start: 15, title: 'Chapter three' }],
+    thumbnails: { sprite: MEDIA + 'thumbs.jpg', interval: 1, width: 160, height: 90, cols: 10 }
+  };
+  function ads(file) {
+    return { enabled: true, positions: ['pre'], default_tag: CDN + 'ads/vast/' + file, timeout_ms: 6000, max_per_session: 0, min_interval_s: 0, personalised: false };
+  }
+
+  function start() {
+    var tag = document.createElement('script');
+    tag.async = true;
+    tag.src = CDN + 'embed.js';
+    tag.dataset.target = '#stage';
+    tag.dataset.aspect = '16:9';
+    tag.dataset.options = JSON.stringify(opts);
+    document.body.appendChild(tag);
+  }
+
+  document.addEventListener('vs:ready', function (e) {
+    var p = e.detail.player;
+    if (!s.plain) { p.addClass('my-theme'); }
+    if (s.pin) { p.userActive(true); }
+    status.textContent = 'Player ' + (window.VSVJS ? window.VSVJS.version : '') + ' from the CDN. Viewing reports are off on this page. Press play to see the controls and ads.';
+    window.vsPlayer = p;
+  });
+  document.addEventListener('vs:error', function (e) { status.textContent = 'The player could not start: ' + e.detail.error; });
+
+  if (s.scenario === 'live') {
+    opts.sources = [{ src: location.origin + '/live/sample/main/master.m3u8', type: 'application/x-mpegURL' }];
+    opts.tenant = 'sample';
+    opts.config = false;
+    opts.epgUrl = location.origin + '/epg/sample/main.json';
+    opts.channelName = 'Sample Channel';
+    return start();
+  }
+  if (s.scenario === 'mine') {
+    fetch(CDN + 'player/config/' + encodeURIComponent(KIT.tenant) + '.json').then(function (r) {
+      if (!r.ok) { throw new Error('tenant "' + KIT.tenant + '" was not found. Check kit.config.js.'); }
+      return r.json();
+    }).then(function (c) {
+      opts.sources = [{ src: 'https://' + c.cdn_hostname + '/live/' + KIT.tenant + '/' + (KIT.channel || 'main') + '/master.m3u8', type: 'application/x-mpegURL' }];
+      opts.tenant = KIT.tenant;
+      start();
+    }).catch(function (e) { status.textContent = 'My channel could not start: ' + e.message; });
+    return;
+  }
+  Object.keys(video).forEach(function (k) { opts[k] = video[k]; });
+  if (s.scenario === 'ads') { doc.ads = ads('pre.xml'); }
+  if (s.scenario === 'noskip') { doc.ads = ads('pre-noskip.xml'); }
+  start();
+})();
+</script>
+</body>
+</html>
